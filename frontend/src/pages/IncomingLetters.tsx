@@ -59,12 +59,16 @@ export const IncomingLetters = () => {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">Incoming Letters</h1>
-          <p className="text-sm text-slate-500">Register, track and manage incoming correspondence.</p>
-        </div>
-        <Button onClick={() => { setEditing(null); setFormOpen(true); }}>+ New Incoming Letter</Button>
-      </div>
+  <div>
+    <h1 className="text-2xl font-bold text-slate-800">Incoming Letters</h1>
+    <p className="text-sm text-slate-500 mt-1">
+      Register, track and manage incoming correspondence.
+    </p>
+  </div>
+  <Button icon="＋" onClick={() => { setEditing(null); setFormOpen(true); }}>
+    New Incoming Letter
+  </Button>
+</div>
 
       <Card className="p-4">
         <DataTable

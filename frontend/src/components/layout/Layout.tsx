@@ -2,9 +2,9 @@ import React from 'react';
 import { Sidebar } from './Sidebar';
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="flex min-h-screen">
+  <div className="flex min-h-screen bg-slate-50">
     <Sidebar />
-    <main className="flex-1 p-6">
+    <main className="flex-1 p-6 lg:p-8">
       <div className="max-w-7xl mx-auto">{children}</div>
     </main>
   </div>

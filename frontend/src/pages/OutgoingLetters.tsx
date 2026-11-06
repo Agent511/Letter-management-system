@@ -5,6 +5,7 @@ import { Modal } from '../components/ui/Modal';
 import { Badge } from '../components/ui/Badge';
 import { DataTable } from '../components/ui/DataTable';
 import { OutgoingLetterForm } from '../components/Outgoing/OutgoingLetterForm';
+import { PlusIcon, PrintIcon } from '../components/ui/Icon';
 import { outgoingApi } from '../services/api';
 import { OutgoingLetter } from '../types';
 
@@ -44,9 +45,9 @@ export const OutgoingLetters = () => {
         <tr><td>Sender</td><td>${r.sender_name}</td></tr>
         <tr><td>Department</td><td>${r.department}</td></tr>
         <tr><td>Subject</td><td>${r.subject}</td></tr>
-        <tr><td>Description</td><td>${r.description}</td></tr>
+        <tr><td>Remarks</td><td>${r.remarks || '—'}</td></tr>
         <tr><td>Letter Date</td><td>${r.letter_date}</td></tr>
-        <tr><td>Delivery</td><td>${r.delivery_channel}</td></tr>
+        <tr><td>Delivery Channel</td><td>${r.delivery_channel}</td></tr>
         <tr><td>Status</td><td>${r.status}</td></tr>
         <tr><td>Priority</td><td>${r.priority}</td></tr>
       </table>
@@ -61,19 +62,21 @@ export const OutgoingLetters = () => {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">Outgoing Letters</h1>
-          <p className="text-sm text-slate-500">Compose, approve and distribute outgoing correspondence.</p>
+          <p className="text-sm text-slate-500 mt-1">Compose, approve and distribute outgoing correspondence.</p>
         </div>
-        <Button onClick={() => { setEditing(null); setFormOpen(true); }}>+ New Outgoing Letter</Button>
+        <Button icon={<PlusIcon />} onClick={() => { setEditing(null); setFormOpen(true); }}>
+          New Outgoing Letter
+        </Button>
       </div>
 
-      <Card className="p-4">
+      <Card className="p-0 overflow-hidden border-none shadow-sm">
         <DataTable
           data={rows}
           columns={[
-            { header: 'Reference', accessor: r => <span className="font-mono text-xs">{r.reference_no}</span> },
-            { header: 'Recipient', accessor: r => <span>{r.recipient_name}<br /><span className="text-xs text-slate-500">{r.recipient_organization}</span></span> },
-            { header: 'Subject', accessor: r => <span className="line-clamp-1">{r.subject}</span> },
-            { header: 'Channel', accessor: r => <span className="capitalize">{r.delivery_channel}</span> },
+            { header: 'Reference', accessor: r => <span className="font-mono text-xs font-medium text-slate-600 bg-slate-100 px-2 py-1 rounded">{r.reference_no}</span> },
+            { header: 'Recipient', accessor: r => <span className="font-medium text-slate-800">{r.recipient_name}<br /><span className="text-xs font-normal text-slate-500">{r.recipient_organization}</span></span> },
+            { header: 'Subject', accessor: r => <span className="line-clamp-1 max-w-[200px]">{r.subject}</span> },
+            { header: 'Channel', accessor: r => <span className="capitalize">{r.delivery_channel.replace('_', ' ')}</span> },
             { header: 'Status', accessor: r => <Badge label={r.status} /> },
             { header: 'Priority', accessor: r => <Badge label={r.priority} /> },
           ]}
@@ -84,40 +87,37 @@ export const OutgoingLetters = () => {
         />
       </Card>
 
-      <Modal
-        open={formOpen}
-        title={editing ? `Edit ${editing.reference_no}` : 'New Outgoing Letter'}
-        onClose={() => { setFormOpen(false); setEditing(null); }}
-      >
-        <OutgoingLetterForm
-          initial={editing || undefined}
-          onSubmit={handleSubmit}
-          onCancel={() => { setFormOpen(false); setEditing(null); }}
-        />
+      <Modal open={formOpen} title={editing ? `Edit ${editing.reference_no}` : 'New Outgoing Letter'} onClose={() => { setFormOpen(false); setEditing(null); }}>
+        <OutgoingLetterForm initial={editing || undefined} onSubmit={handleSubmit} onCancel={() => { setFormOpen(false); setEditing(null); }} />
       </Modal>
 
       <Modal open={!!preview} title="Letter Preview" onClose={() => setPreview(null)}>
         {preview && (
-          <div className="space-y-3 text-sm">
-            {[
-              ['Reference', preview.reference_no],
-              ['Recipient', `${preview.recipient_name} (${preview.recipient_organization})`],
-              ['Sender', preview.sender_name],
-              ['Department', preview.department],
-              ['Subject', preview.subject],
-              ['Description', preview.description],
-              ['Letter Date', preview.letter_date],
-              ['Delivery Channel', preview.delivery_channel],
-              ['Status', preview.status],
-              ['Priority', preview.priority],
-            ].map(([k, v]) => (
-              <div key={k} className="grid grid-cols-3 gap-2 border-b border-slate-100 py-2">
-                <span className="text-slate-500 font-medium">{k}</span>
-                <span className="col-span-2 text-slate-800">{v || '—'}</span>
-              </div>
-            ))}
+          <div className="space-y-4 text-sm">
+            <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 grid grid-cols-2 gap-4">
+              {[
+                ['Reference', preview.reference_no],
+                ['Recipient', `${preview.recipient_name} (${preview.recipient_organization})`],
+                ['Sender', preview.sender_name],
+                ['Department', preview.department],
+                ['Subject', preview.subject],
+                ['Letter Date', preview.letter_date],
+                ['Delivery Channel', preview.delivery_channel.replace('_', ' ')],
+                ['Status', preview.status],
+                ['Priority', preview.priority],
+              ].map(([k, v]) => (
+                <div key={k}>
+                  <span className="block text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-0.5">{k}</span>
+                  <span className="text-slate-800 font-medium">{v || '—'}</span>
+                </div>
+              ))}
+            </div>
+            <div>
+              <span className="block text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-1">Remarks</span>
+              <p className="text-slate-700 bg-slate-50 p-3 rounded-md border border-slate-100">{preview.remarks || 'No remarks provided.'}</p>
+            </div>
             <div className="flex justify-end pt-2">
-              <Button onClick={() => printLetter(preview)}>🖨 Print</Button>
+              <Button icon={<PrintIcon size={16} />} onClick={() => printLetter(preview)}>Print Letter</Button>
             </div>
           </div>
         )}

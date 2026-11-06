@@ -6,7 +6,7 @@ export interface IncomingLetter {
   recipient_name: string;
   department: string;
   subject: string;
-  description: string;
+  remarks: string; // Changed from description
   letter_date: string;
   received_date: string;
   status: string;
@@ -23,7 +23,7 @@ export interface OutgoingLetter {
   sender_name: string;
   department: string;
   subject: string;
-  description: string;
+  remarks: string; // Changed from description
   letter_date: string;
   delivery_channel: string;
   status: string;
